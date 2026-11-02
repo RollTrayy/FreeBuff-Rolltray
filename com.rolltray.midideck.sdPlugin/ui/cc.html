@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<title>MIDI CC</title>
+		<link rel="stylesheet" href="pi.css" />
+	</head>
+	<body>
+		<p class="title">MIDI CC</p>
+
+		<div class="row">
+			<label for="channel">Canal</label>
+			<div class="control"><select id="channel"></select></div>
+		</div>
+
+		<div class="row">
+			<label for="controller">Contrôleur</label>
+			<div class="control"><input id="controller" type="number" min="0" max="127" step="1" /></div>
+		</div>
+
+		<div class="row">
+			<label for="mode">Comportement</label>
+			<div class="control">
+				<select id="mode">
+					<option value="trigger">Déclenchement simple</option>
+					<option value="toggle">Bascule A / B</option>
+					<option value="momentary">Momentané (appui / relâchement)</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="row">
+			<label for="valueA">Valeur A</label>
+			<div class="control">
+				<input id="valueA" type="range" min="0" max="127" step="1" />
+				<span class="badge" id="valueA-value">127</span>
+			</div>
+		</div>
+
+		<div class="row">
+			<label for="valueB">Valeur B</label>
+			<div class="control">
+				<input id="valueB" type="range" min="0" max="127" step="1" />
+				<span class="badge" id="valueB-value">0</span>
+			</div>
+		</div>
+
+		<p class="hint" id="mode-hint"></p>
+
+		<script src="pi.js"></script>
+		<script>
+			const DEFAULTS = { channel: 1, controller: 1, mode: "trigger", valueA: 127, valueB: 0 };
+
+			const els = {
+				channel: document.getElementById("channel"),
+				controller: document.getElementById("controller"),
+				mode: document.getElementById("mode"),
+				valueA: document.getElementById("valueA"),
+				valueAValue: document.getElementById("valueA-value"),
+				valueB: document.getElementById("valueB"),
+				valueBValue: document.getElementById("valueB-value"),
+				modeHint: document.getElementById("mode-hint"),
+			};
+
+			for (let channel = 1; channel <= 16; channel += 1) {
+				const option = document.createElement("option");
+				option.value = String(channel);
+				option.textContent = String(channel);
+				els.channel.append(option);
+			}
+
+			const HINTS = {
+				trigger: "Chaque appui envoie la valeur A.",
+				toggle: "1er appui : valeur A · 2e appui : valeur B, en alternance.",
+				momentary: "Valeur A à l'appui, valeur B au relâchement (bouton maintenu).",
+			};
+
+			const clampInt = (value, min, max, fallback) => {
+				const parsed = Number.parseInt(value, 10);
+				if (!Number.isFinite(parsed)) return fallback;
+				return Math.min(Math.max(parsed, min), max);
+			};
+
+			const read = () => ({
+				channel: clampInt(els.channel.value, 1, 16, DEFAULTS.channel),
+				controller: clampInt(els.controller.value, 0, 127, DEFAULTS.controller),
+				mode: els.mode.value,
+				valueA: clampInt(els.valueA.value, 0, 127, DEFAULTS.valueA),
+				valueB: clampInt(els.valueB.value, 0, 127, DEFAULTS.valueB),
+			});
+
+			const paint = (settings) => {
+				const next = Object.assign({}, DEFAULTS, settings);
+				els.channel.value = String(next.channel);
+				els.controller.value = String(next.controller);
+				els.mode.value = next.mode;
+				els.valueA.value = String(next.valueA);
+				els.valueAValue.textContent = String(next.valueA);
+				els.valueB.value = String(next.valueB);
+				els.valueBValue.textContent = String(next.valueB);
+				els.modeHint.textContent = HINTS[next.mode] || HINTS.trigger;
+				document.getElementById("valueB").closest(".row").hidden = next.mode === "trigger";
+			};
+
+			const commit = () => {
+				const settings = read();
+				paint(settings);
+				pi.save(settings);
+			};
+
+			Object.keys(els).forEach((key) => els[key].addEventListener("change", commit));
+
+			["valueA", "valueB"].forEach((key) => {
+				els[key].addEventListener("input", () => {
+					els[key + "Value"].textContent = els[key].value;
+				});
+			});
+
+			els.mode.addEventListener("change", () => {
+				els.modeHint.textContent = HINTS[els.mode.value] || HINTS.trigger;
+			});
+
+			pi.connect(paint);
+		</script>
+	</body>
+</html>

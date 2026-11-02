@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<title>MIDI CC Dial</title>
+		<link rel="stylesheet" href="pi.css" />
+	</head>
+	<body>
+		<p class="title">MIDI CC Dial</p>
+
+		<div class="row">
+			<label for="channel">Canal</label>
+			<div class="control"><select id="channel"></select></div>
+		</div>
+
+		<div class="row">
+			<label for="controller">Contrôleur</label>
+			<div class="control"><input id="controller" type="number" min="0" max="127" step="1" /></div>
+		</div>
+
+		<div class="row">
+			<label for="step">Pas par cran</label>
+			<div class="control"><input id="step" type="number" min="1" max="64" step="1" /></div>
+		</div>
+
+		<div class="row">
+			<label for="min">Valeur mini</label>
+			<div class="control"><input id="min" type="number" min="0" max="127" step="1" /></div>
+		</div>
+
+		<div class="row">
+			<label for="max">Valeur maxi</label>
+			<div class="control"><input id="max" type="number" min="0" max="127" step="1" /></div>
+		</div>
+
+		<div class="row">
+			<label for="defaultValue">Valeur initiale</label>
+			<div class="control"><input id="defaultValue" type="number" min="0" max="127" step="1" /></div>
+		</div>
+
+		<div class="row">
+			<label for="pressMode">Appui sur le bouton</label>
+			<div class="control">
+				<select id="pressMode">
+					<option value="resync">Renvoyer la valeur</option>
+					<option value="reset">Revenir à la valeur initiale</option>
+					<option value="none">Rien</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="row">
+			<label for="invert">Inverser</label>
+			<div class="control">
+				<label class="checkbox"><input id="invert" type="checkbox" /> sens de rotation inversé</label>
+			</div>
+		</div>
+
+		<p class="hint">Tournez le bouton pour balayer le CC ; la valeur courante s'affiche sur l'écran du Stream Deck +.</p>
+
+		<script src="pi.js"></script>
+		<script>
+			const DEFAULTS = {
+				channel: 1,
+				controller: 74,
+				step: 1,
+				min: 0,
+				max: 127,
+				defaultValue: 64,
+				invert: false,
+				pressMode: "resync",
+			};
+
+			const els = {
+				channel: document.getElementById("channel"),
+				controller: document.getElementById("controller"),
+				step: document.getElementById("step"),
+				min: document.getElementById("min"),
+				max: document.getElementById("max"),
+				defaultValue: document.getElementById("defaultValue"),
+				pressMode: document.getElementById("pressMode"),
+				invert: document.getElementById("invert"),
+			};
+
+			for (let channel = 1; channel <= 16; channel += 1) {
+				const option = document.createElement("option");
+				option.value = String(channel);
+				option.textContent = String(channel);
+				els.channel.append(option);
+			}
+
+			const clampInt = (value, min, max, fallback) => {
+				const parsed = Number.parseInt(value, 10);
+				if (!Number.isFinite(parsed)) return fallback;
+				return Math.min(Math.max(parsed, min), max);
+			};
+
+			const read = () => ({
+				channel: clampInt(els.channel.value, 1, 16, DEFAULTS.channel),
+				controller: clampInt(els.controller.value, 0, 127, DEFAULTS.controller),
+				step: clampInt(els.step.value, 1, 64, DEFAULTS.step),
+				min: clampInt(els.min.value, 0, 127, DEFAULTS.min),
+				max: clampInt(els.max.value, 0, 127, DEFAULTS.max),
+				defaultValue: clampInt(els.defaultValue.value, 0, 127, DEFAULTS.defaultValue),
+				invert: els.invert.checked,
+				pressMode: els.pressMode.value,
+			});
+
+			const paint = (settings) => {
+				const next = Object.assign({}, DEFAULTS, settings);
+				els.channel.value = String(next.channel);
+				els.controller.value = String(next.controller);
+				els.step.value = String(next.step);
+				els.min.value = String(next.min);
+				els.max.value = String(next.max);
+				els.defaultValue.value = String(next.defaultValue);
+				els.pressMode.value = next.pressMode;
+				els.invert.checked = Boolean(next.invert);
+			};
+
+			const commit = () => {
+				const settings = read();
+				paint(settings);
+				pi.save(settings);
+			};
+
+			Object.keys(els).forEach((key) => els[key].addEventListener("change", commit));
+
+			pi.connect(paint);
+		</script>
+	</body>
+</html>

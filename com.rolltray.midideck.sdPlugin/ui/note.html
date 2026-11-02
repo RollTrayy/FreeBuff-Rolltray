@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<title>MIDI Note</title>
+		<link rel="stylesheet" href="pi.css" />
+	</head>
+	<body>
+		<p class="title">MIDI Note</p>
+
+		<div class="row">
+			<label for="channel">Canal</label>
+			<div class="control"><select id="channel"></select></div>
+		</div>
+
+		<div class="row">
+			<label for="note">Note</label>
+			<div class="control">
+				<input id="note" type="number" min="0" max="127" step="1" />
+				<span class="badge" id="note-name">C4</span>
+			</div>
+		</div>
+
+		<div class="row">
+			<label for="velocity">Vélocité</label>
+			<div class="control">
+				<input id="velocity" type="range" min="1" max="127" step="1" />
+				<span class="badge" id="velocity-value">100</span>
+			</div>
+		</div>
+
+		<div class="row">
+			<label for="mode">Déclenchement</label>
+			<div class="control">
+				<select id="mode">
+					<option value="timed">Note courte (durée fixe)</option>
+					<option value="gate">Maintenue pendant l'appui</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="row" id="duration-row">
+			<label for="duration">Durée (ms)</label>
+			<div class="control"><input id="duration" type="number" min="10" max="10000" step="10" /></div>
+		</div>
+
+		<p class="hint">Envoyé sur le port virtuel « Stream Deck MIDI », visible automatiquement dans votre DAW.</p>
+
+		<script src="pi.js"></script>
+		<script>
+			const DEFAULTS = { channel: 1, note: 60, velocity: 100, mode: "timed", durationMs: 150 };
+			const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+			const els = {
+				channel: document.getElementById("channel"),
+				note: document.getElementById("note"),
+				noteName: document.getElementById("note-name"),
+				velocity: document.getElementById("velocity"),
+				velocityValue: document.getElementById("velocity-value"),
+				mode: document.getElementById("mode"),
+				duration: document.getElementById("duration"),
+				durationRow: document.getElementById("duration-row"),
+			};
+
+			for (let channel = 1; channel <= 16; channel += 1) {
+				const option = document.createElement("option");
+				option.value = String(channel);
+				option.textContent = String(channel);
+				els.channel.append(option);
+			}
+
+			const clampInt = (value, min, max, fallback) => {
+				const parsed = Number.parseInt(value, 10);
+				if (!Number.isFinite(parsed)) return fallback;
+				return Math.min(Math.max(parsed, min), max);
+			};
+
+			const noteLabel = (note) => NOTE_NAMES[note % 12] + (Math.floor(note / 12) - 1);
+
+			const read = () => ({
+				channel: clampInt(els.channel.value, 1, 16, DEFAULTS.channel),
+				note: clampInt(els.note.value, 0, 127, DEFAULTS.note),
+				velocity: clampInt(els.velocity.value, 1, 127, DEFAULTS.velocity),
+				mode: els.mode.value === "gate" ? "gate" : "timed",
+				durationMs: clampInt(els.duration.value, 10, 10000, DEFAULTS.durationMs),
+			});
+
+			const paint = (settings) => {
+				const next = Object.assign({}, DEFAULTS, settings);
+				els.channel.value = String(next.channel);
+				els.note.value = String(next.note);
+				els.noteName.textContent = noteLabel(next.note);
+				els.velocity.value = String(next.velocity);
+				els.velocityValue.textContent = String(next.velocity);
+				els.mode.value = next.mode;
+				els.duration.value = String(next.durationMs);
+				els.durationRow.hidden = next.mode !== "timed";
+			};
+
+			const commit = () => {
+				const settings = read();
+				paint(settings);
+				pi.save(settings);
+			};
+
+			Object.keys(els).forEach((key) => els[key].addEventListener("change", commit));
+
+			els.velocity.addEventListener("input", () => {
+				els.velocityValue.textContent = els.velocity.value;
+			});
+
+			els.note.addEventListener("input", () => {
+				els.noteName.textContent = noteLabel(clampInt(els.note.value, 0, 127, DEFAULTS.note));
+			});
+
+			els.mode.addEventListener("change", () => {
+				els.durationRow.hidden = els.mode.value !== "timed";
+			});
+
+			pi.connect(paint);
+		</script>
+	</body>
+</html>

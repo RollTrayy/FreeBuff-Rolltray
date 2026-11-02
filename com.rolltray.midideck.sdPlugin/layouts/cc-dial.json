@@ -1,0 +1,34 @@
+{
+	"$schema": "https://schemas.elgato.com/streamdeck/plugins/layout.json",
+	"id": "cc-dial",
+	"controller": "Encoder",
+	"items": [
+		{
+			"key": "label",
+			"type": "text",
+			"rect": [14, 8, 172, 18],
+			"font": { "size": 14, "weight": 600 },
+			"alignment": "left",
+			"color": "#9AA7B4"
+		},
+		{
+			"key": "value",
+			"type": "text",
+			"rect": [14, 28, 172, 34],
+			"font": { "size": 30, "weight": 700 },
+			"alignment": "center",
+			"color": "#FFFFFF"
+		},
+		{
+			"key": "indicator",
+			"type": "bar",
+			"rect": [14, 70, 172, 14],
+			"value": 0,
+			"range": { "min": 0, "max": 127 },
+			"subtype": 4,
+			"border_w": 0,
+			"bar_bg_c": "#2A323B",
+			"bar_fill_c": "#4DE1C1"
+		}
+	]
+}

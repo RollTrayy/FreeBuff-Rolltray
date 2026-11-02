@@ -1,0 +1,83 @@
+{
+	"$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+	"Name": "MIDI Deck",
+	"Version": "1.0.0.0",
+	"Author": "Rolltray",
+	"Description": "Send MIDI notes and control-change messages from your Stream Deck. A virtual MIDI port named \"Stream Deck MIDI\" is created automatically, so any DAW sees it without setting up an IAC bus.",
+	"Category": "MIDI Deck",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"Icon": "imgs/plugin/marketplace",
+	"UUID": "com.rolltray.midideck",
+	"SDKVersion": 3,
+	"Software": {
+		"MinimumVersion": "6.9"
+	},
+	"Nodejs": {
+		"Version": "20"
+	},
+	"OS": [
+		{
+			"Platform": "mac",
+			"MinimumVersion": "12"
+		}
+	],
+	"CodePath": "bin/plugin.js",
+	"Actions": [
+		{
+			"Name": "MIDI Note",
+			"UUID": "com.rolltray.midideck.note",
+			"Icon": "imgs/actions/note",
+			"Tooltip": "Sends a MIDI note to the virtual \"Stream Deck MIDI\" port.",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/note",
+					"TitleAlignment": "bottom",
+					"FontSize": 12
+				}
+			],
+			"PropertyInspectorPath": "ui/note.html",
+			"SupportedInMultiActions": true,
+			"UserTitleEnabled": true
+		},
+		{
+			"Name": "MIDI CC",
+			"UUID": "com.rolltray.midideck.cc",
+			"Icon": "imgs/actions/cc",
+			"Tooltip": "Sends a MIDI control-change (CC) message: trigger, toggle or momentary.",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/cc",
+					"TitleAlignment": "bottom",
+					"FontSize": 12
+				}
+			],
+			"PropertyInspectorPath": "ui/cc.html",
+			"SupportedInMultiActions": true,
+			"UserTitleEnabled": true
+		},
+		{
+			"Name": "MIDI CC Dial",
+			"UUID": "com.rolltray.midideck.cc-dial",
+			"Icon": "imgs/actions/cc-dial",
+			"Tooltip": "Stream Deck + dial: rotate to send a CC value (potentiometer style).",
+			"Controllers": ["Encoder"],
+			"Encoder": {
+				"layout": "layouts/cc-dial.json",
+				"TriggerDescription": {
+					"Rotate": "Send CC value",
+					"Push": "Re-send value",
+					"Touch": "Re-send value"
+				}
+			},
+			"States": [
+				{
+					"Image": "imgs/actions/cc-dial"
+				}
+			],
+			"PropertyInspectorPath": "ui/cc-dial.html",
+			"UserTitleEnabled": false
+		}
+	]
+}

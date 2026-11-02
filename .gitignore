@@ -1,0 +1,14 @@
+node_modules/
+*.log
+.DS_Store
+
+# Build output
+com.rolltray.midideck.sdPlugin/bin/plugin.js
+com.rolltray.midideck.sdPlugin/bin/*.js.map
+
+# Compiled CoreMIDI helper (built locally on macOS with scripts/build-midi-bridge.sh)
+com.rolltray.midideck.sdPlugin/bin/midi-bridge
+com.rolltray.midideck.sdPlugin/bin/midi-bridge-*
+
+# Packaged plugin
+*.streamDeckPlugin

@@ -1,0 +1,93 @@
+:root {
+	color-scheme: dark;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 10px 12px 16px;
+	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+	font-size: 12px;
+	color: #dcdcdc;
+	background: #2d2d2d;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.title {
+	margin: 0 0 12px;
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #7f8b96;
+}
+
+.row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0 0 10px;
+}
+
+.row > label {
+	flex: 0 0 108px;
+	text-align: right;
+	color: #b6bec6;
+}
+
+.control {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+input[type="number"],
+select {
+	width: 100%;
+	min-width: 0;
+	padding: 4px 6px;
+	font-family: inherit;
+	font-size: 12px;
+	color: #eaeaea;
+	background: #1e1e1e;
+	border: 1px solid #4b5157;
+	border-radius: 4px;
+}
+
+input[type="number"]:focus,
+select:focus {
+	outline: none;
+	border-color: #4de1c1;
+}
+
+input[type="range"] {
+	flex: 1;
+	accent-color: #4de1c1;
+}
+
+input[type="checkbox"] {
+	accent-color: #4de1c1;
+}
+
+.badge {
+	flex: 0 0 52px;
+	text-align: right;
+	color: #4de1c1;
+	font-variant-numeric: tabular-nums;
+}
+
+.hint {
+	margin: -4px 0 12px 118px;
+	font-size: 11px;
+	line-height: 1.45;
+	color: #8a9199;
+}
+
+[hidden] {
+	display: none !important;
+}

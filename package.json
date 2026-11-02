@@ -1,0 +1,32 @@
+{
+  "name": "streamdeck-midi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stream Deck plugin that sends MIDI (notes + CC) through an auto-created virtual MIDI port on macOS.",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart com.rolltray.midideck\"",
+    "icons": "node scripts/gen-icons.mjs",
+    "native": "bash scripts/build-midi-bridge.sh",
+    "test": "tsc --noEmit",
+    "setup": "npm run icons && npm run build && npm run native && npm run install-plugin",
+    "install-plugin": "streamdeck link com.rolltray.midideck.sdPlugin",
+    "restart": "streamdeck restart com.rolltray.midideck",
+    "package": "npm run icons && npm run build && npm run native && streamdeck pack com.rolltray.midideck.sdPlugin --force"
+  },
+  "dependencies": {
+    "@elgato/streamdeck": "^3.0.4"
+  },
+  "devDependencies": {
+    "@elgato/cli": "^1.7.4",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@types/node": "^24.0.0",
+    "rollup": "^4.28.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2"
+  }
+}
